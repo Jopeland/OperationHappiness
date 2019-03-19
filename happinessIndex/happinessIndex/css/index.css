@@ -1,0 +1,34 @@
+﻿body {
+    background-color: dodgerblue;
+    margin:0;
+    padding: 0;
+    height:100%;
+    background-size: 0;
+}
+
+#header {
+    background-color: white;
+    margin: 0;
+    padding: 0;
+    padding-left: 15px;
+    height: 60px;
+}
+
+.title {
+    vertical-align: middle;
+    font-family: Papyrus, cursive;
+}
+
+.form {
+    text-align: center;
+    background-color: white;
+    width: 300px;
+    padding: 25px;
+    margin: 25px;
+    border-radius: 25px;
+    display: inline-block;
+}
+
+.main{
+    text-align: center;
+}
