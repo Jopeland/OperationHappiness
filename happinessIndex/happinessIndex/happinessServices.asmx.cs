@@ -330,7 +330,7 @@ namespace happinessIndex.App_Start
                         score = (int)reader["Happiness"];
 
                         int num = 1;
-                        html += "<tr id='row" + num +"><td class='email'>" + email + "</td><td class='score'>" + score + "</td></tr>";
+                        html += "<tr><td class='email'>" + email + "</td><td class='score'>" + score + "</td></tr>";
                         num++;
                     }
 

@@ -9,7 +9,7 @@ function ValidateLogin() {
 
     console.log("Input received. Attempting to validate credentials.");
 
-    var webMethod = "happinessServices.asmx/VerifyCredentials";
+    var webMethod = "../happinessServices.asmx/VerifyCredentials";
     var parameters = "{\"username\":\"" + encodeURI(username) + "\",\"password\":\"" + encodeURI(password) + "\"}";
 
     $.ajax({
