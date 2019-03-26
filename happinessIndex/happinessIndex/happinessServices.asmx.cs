@@ -76,5 +76,56 @@ namespace happinessIndex.App_Start
                 sqlConnection.Close();
             }
         }
+
+        [WebMethod]
+        // [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public string ViewAccounts(string admin)
+        {
+            // variable to store HTML string to be appended using JS
+            string html = "";
+            string email = "";
+            int score = 50;
+
+            // mostly the same code as VerifyCredentials
+            string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
+
+            // instantiating query
+            string sqlSelect = $"Select * FROM employees";
+
+            MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
+            MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
+            sqlConnection.Open();
+
+            MySqlDataReader reader = sqlCommand.ExecuteReader();
+
+            try
+            {
+                if (reader.HasRows)
+                {
+                    while (reader.Read())
+                    {
+                        email = (string)reader["Email"];
+                        score = (int)reader["Happiness"];
+
+                        html += "<tr><td>" + email + "</td><td>" + score + "</td></tr>";
+                    }
+
+                    return html;
+                }
+
+                else
+                {
+                    html = null;
+                    return html;
+                }
+            }
+
+            finally
+            {
+                reader.Close();
+                sqlConnection.Close();
+            }
+        }
+
     }
 }
