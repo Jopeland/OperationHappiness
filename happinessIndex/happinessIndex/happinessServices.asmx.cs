@@ -14,11 +14,11 @@ using MySql.Data.MySqlClient;
 //and we need this to mainpulate data from a db
 using System.Data;
 // needed for gmail connectivity
-using Google.Apis.Auth.OAuth2;
-using Google.Apis.Gmail.v1;
-using Google.Apis.Gmail.v1.Data;
-using Google.Apis.Services;
-using Google.Apis.Util.Store;
+//using Google.Apis.Auth.OAuth2;
+//using Google.Apis.Gmail.v1;
+//using Google.Apis.Gmail.v1.Data;
+//using Google.Apis.Services;
+//using Google.Apis.Util.Store;
 using System.Text;
 using System.Reflection;
 
@@ -298,5 +298,59 @@ namespace happinessIndex.App_Start
                 return "Failed";
             }
         }
+
+        [WebMethod]
+        // [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public string ViewAccounts(string admin)
+        {
+            // variable to store HTML string to be appended using JS
+            string html = "";
+            string email = "";
+            int score = 50;
+
+            // mostly the same code as VerifyCredentials
+            string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
+
+            // instantiating query
+            string sqlSelect = $"Select * FROM employees";
+
+            MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
+            MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
+            sqlConnection.Open();
+
+            MySqlDataReader reader = sqlCommand.ExecuteReader();
+
+            try
+            {
+                if (reader.HasRows)
+                {
+                    while (reader.Read())
+                    {
+                        email = (string)reader["Email"];
+                        score = (int)reader["Happiness"];
+
+                        int num = 1;
+                        html += "<tr id='row" + num +"><td class='email'>" + email + "</td><td class='score'>" + score + "</td></tr>";
+                        num++;
+                    }
+
+                    return html;
+                }
+
+                else
+                {
+                    html = null;
+                    return html;
+                }
+            }
+
+            finally
+            {
+                reader.Close();
+                sqlConnection.Close();
+            }
+        }
+
     }
 }
+

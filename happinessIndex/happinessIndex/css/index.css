@@ -32,3 +32,46 @@
 .main{
     text-align: center;
 }
+
+.info {
+    text-align: center;
+    background-color: white;
+    width: 1200px;
+    padding: 25px;
+    margin: 25px;
+    border-radius: 25px;
+    display: inline-block;
+}
+
+.data {
+    text-align: center;
+    background-color: white;
+    width: 90%;
+    padding: 25px;
+    margin: 25px;
+    border-radius: 25px;
+    display: inline-block;
+}
+
+.data tr{
+    text-align: center;
+    background-color: #F9F9F9;
+    width: 95%;
+    padding: 10px;
+    display: inline-block;
+}
+
+.data tr th{
+    border-bottom: 1px solid black;
+    padding-bottom: 5px;
+}
+
+.email, .score{
+    width: 500px;
+}
+svg path {
+    will-change: auto;
+    stroke-width: 20px;
+    stroke-miterlimit: round;
+    transition: stroke-dashoffset 850ms ease-in-out;
+}
