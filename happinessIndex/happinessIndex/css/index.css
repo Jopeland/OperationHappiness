@@ -69,6 +69,7 @@
 .email, .score{
     width: 500px;
 }
+
 svg path {
     will-change: auto;
     stroke-width: 20px;
