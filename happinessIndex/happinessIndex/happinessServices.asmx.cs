@@ -351,6 +351,119 @@ namespace happinessIndex.App_Start
             }
         }
 
+        [WebMethod]
+        public void SendFeedbackEmail()
+        {
+            // Establish Outlook connection
+            // Outlook variables instantiated and assigned to outlook folders
+            Outlook.Application outlookApp = new Outlook.Application();
+            Outlook.NameSpace outlookNS = (Outlook.NameSpace)outlookApp.GetNamespace("MAPI");
+            outlookNS.Logon(Missing.Value, Missing.Value, false, true);
+
+            // strings to contain the parts of the message
+            string subject = "Feedback Survey Request";
+            string body = "Hi.  We would like to hear about how work has been for you recently. Please click this link to take the survey: http://www.usaa.com";
+
+            // integer for score change
+            int change;
+
+            // declaring lists to store users
+            List<string> emailList = new List<string>();
+            List<string> feedbackList = new List<string>();
+
+            // Same SQL stuff as everything else with a select
+            string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
+
+            // instantiating query that takes all of the individual emails in the scores table and puts them into the list
+            string sqlSelect = $"Select DISTINCT UserEmail FROM scores";
+
+            MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString); 
+            MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
+            sqlConnection.Open();
+
+            MySqlDataReader reader = sqlCommand.ExecuteReader();
+
+            try
+            {
+                if (reader.HasRows)
+                {
+                    while (reader.Read())
+                    {
+                        emailList.Add((string)reader["UserEmail"]);
+                    }
+
+                    // close the first reader
+                    reader.Close();
+                }
+
+                // if the list has values another sql statement to add each user with a large score difference to the feedback email list
+                if (emailList.Count > 0)
+                {
+                    // A for loop loops through the list and passes it as an argument for a sql select
+                    for(int i = 0; i < emailList.Count; i++)
+                    {
+                        change = 0;
+
+                        // SQL command takes only the top 2 results that the database contains
+                        MySqlCommand feedbackUsers = new MySqlCommand($"Select ScoreID, Score FROM scores WHERE UserEmail = '{emailList[i]}' ORDER BY ScoreID DESC LIMIT 2",sqlConnection);
+                        reader = feedbackUsers.ExecuteReader();
+
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                // if the change variable is 0, change is set equal to score
+                                if(change == 0)
+                                {
+                                    change = reader.GetInt32(reader.GetOrdinal("Score"));
+                                }
+                                else // else it finds the difference between the first score and the second
+                                {
+                                    change = change - reader.GetInt32(reader.GetOrdinal("Score"));
+                                }
+                            }
+
+                            // if the change is greater than +5 or less than -5, they are added to the feedbackList
+                            if (change > 5 || change < -5)
+                            {
+                                feedbackList.Add(emailList[i]);
+                            }
+                        }
+
+                        // reader closed
+                        reader.Close();
+                    }
+                }
+            }
+
+            finally
+            {
+                sqlConnection.Close();
+            }
+
+            // Finding the right email account ("scrumdaddiez@gmail.com") to use to send the email
+            Outlook.Accounts accounts = outlookApp.Session.Accounts;
+
+            // foreach loops through and looks for scrumdaddiez@gmail.com and sets it to the sender account
+            foreach (Outlook.Account account in accounts)
+            {
+                if(account.SmtpAddress == "scrumdaddiez@gmail.com")
+                {
+                    // for every email address in the feedbackList, an email is sent
+                    for (int i = 0; i < feedbackList.Count; i++)
+                    {
+                        // New Mail Item is created and sent
+                        Outlook.MailItem email = (Outlook.MailItem)outlookApp.CreateItem(Outlook.OlItemType.olMailItem);
+                        email.Subject = subject;
+                        email.HTMLBody = body;
+                        email.To = feedbackList[i];
+                        email.Importance = Outlook.OlImportance.olImportanceHigh;
+                        email.SendUsingAccount = account;
+                        email.Send();
+                    }
+                }
+            }
+        }
     }
 }
 
