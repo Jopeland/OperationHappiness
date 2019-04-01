@@ -1,5 +1,15 @@
 ﻿body {
-    background-color: dodgerblue;
+    background-color: rgba(56, 182, 230, 0.62);
+	font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+    margin:0;
+    padding: 0;
+    height:100%;
+    background-size: 0;
+}
+
+#account {
+    background-color: rgba(237, 84, 76, 0.62);
+	font-family: 'Open Sans', Helvetica, Arial, sans-serif;
     margin:0;
     padding: 0;
     height:100%;
@@ -7,7 +17,7 @@
 }
 
 #header {
-    background-color: white;
+    background-color: rgba(255,255,255,0.7);
     margin: 0;
     padding: 0;
     padding-left: 15px;
@@ -21,7 +31,7 @@
 
 .form {
     text-align: center;
-    background-color: white;
+    background-color: rgba(255,255,255,0.7);
     width: 300px;
     padding: 25px;
     margin: 25px;
@@ -35,7 +45,7 @@
 
 .info {
     text-align: center;
-    background-color: white;
+    background-color: rgba(255,255,255,0.7);
     width: 1200px;
     padding: 25px;
     margin: 25px;
@@ -45,7 +55,7 @@
 
 .data {
     text-align: center;
-    background-color: white;
+    background-color: rgba(255,255,255,0.7);
     width: 90%;
     padding: 25px;
     margin: 25px;
@@ -55,7 +65,7 @@
 
 .data tr{
     text-align: center;
-    background-color: #F9F9F9;
+    background-color: rgba(255,255,255,0.7);
     width: 95%;
     padding: 10px;
     display: inline-block;
@@ -68,6 +78,7 @@
 
 .email, .score{
     width: 500px;
+	background-color: rgba(255,255,255,0.7);
 }
 
 svg path {
