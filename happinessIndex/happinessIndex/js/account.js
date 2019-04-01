@@ -25,6 +25,8 @@
         }
     })
 
+    document.getElementById("feedbackButton").addEventListener("click", sendFeedback);
+
     //$(".data tr").each(function () {
     //   if(this.id != ""){
     //    var score = $("#score").val();
@@ -55,4 +57,19 @@
     //   path.style.strokeDashoffset = Math.max(0, to);
     //});
 
+}
+
+function sendFeedback() {
+    $.ajax({
+        type: "POST",
+        url: "../happinessServices.asmx/SendFeedbackEmail",
+        contentType: "application/json;charset=utf-8",
+        dataType: "json",
+        success: function (data) {
+            console.log("Sending feedback emails.")
+        },
+        error: function (e) {
+            alert("Something went wrong");
+        }
+    })
 }
