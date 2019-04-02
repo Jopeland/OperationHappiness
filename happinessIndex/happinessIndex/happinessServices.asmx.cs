@@ -243,6 +243,9 @@ namespace happinessIndex.App_Start
             string subject;
             string body;
 
+            // list of mailitems
+            List<Outlook.MailItem> emails = new List<Outlook.MailItem>();
+
             try
             {
                 // Outlook variables instantiated and assigned to outlook folders
@@ -257,13 +260,18 @@ namespace happinessIndex.App_Start
                 // a foreach loop goes through all of the messages, adds them to the database, and then marks them as read
                 foreach (Outlook.MailItem mail in messages)
                 {
-                    mail.UnRead = false;
+                    emails.Add(mail);                    
+                }
+
+                for (int i = 0; i < emails.Count; i++)
+                {
+                    emails[i].UnRead = false;
 
                     // Each part of the message is stored in a variable
-                    sender = mail.SenderEmailAddress;
-                    date = mail.SentOn.ToString();
-                    subject = mail.Subject;
-                    body = mail.Body;
+                    sender = emails[i].SenderEmailAddress;
+                    date = emails[i].SentOn.ToString();
+                    subject = emails[i].Subject;
+                    body = emails[i].Body;
 
                     // if the 4 strings are not empty, the email is added to the emails database(just for testing, this isnt the permanent solution for now)
                     if (sender != null && date != null && subject != null && body != null)
@@ -289,8 +297,8 @@ namespace happinessIndex.App_Start
 
                         sqlConnection.Close();
                     }
-                }
 
+                }
                 return "Worked";
             }
             catch

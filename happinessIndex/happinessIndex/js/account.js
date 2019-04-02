@@ -26,6 +26,7 @@
     })
 
     document.getElementById("feedbackButton").addEventListener("click", sendFeedback);
+    document.getElementById("emailtodb").addEventListener("click", saveEmail);
 
     //$(".data tr").each(function () {
     //   if(this.id != ""){
@@ -70,6 +71,21 @@ function sendFeedback() {
         },
         error: function (e) {
             alert("Something went wrong");
+        }
+    })
+}
+
+function saveEmail() {
+    $.ajax({
+        type: "POST",
+        url: "../happinessServices.asmx/RetrieveEmails",
+        contentType: "application/json;charset=utf-8",
+        dataType: "json",
+        success: function (data) {
+            console.log(data)
+        },
+        error: function (e) {
+            alert(data);
         }
     })
 }
