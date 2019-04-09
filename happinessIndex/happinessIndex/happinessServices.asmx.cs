@@ -535,6 +535,87 @@ namespace happinessIndex.App_Start
                 sqlConnection.Close();
             }
         }
+
+        [WebMethod]
+        public List<string> GetDepartments()
+        {
+            // list to store departments
+            List<string> departments = new List<string>();
+
+            // SQL query to get all of the unique departments stored in the database
+            string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
+
+            string sqlSelect = $"Select DISTINCT Department FROM employees ORDER BY Department DESC";
+
+            MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
+            MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
+            sqlConnection.Open();
+            MySqlDataReader reader = sqlCommand.ExecuteReader();
+
+            try
+            {
+                if (reader.HasRows)
+                {
+                    while (reader.Read())
+                    {
+                        departments.Add((string)reader["Department"]);
+                    }
+                }
+            }
+
+            finally
+            {
+                reader.Close();
+            }
+
+            return departments;
+
+        }
+
+        [WebMethod]
+        public List<int> GetAverageScores()
+        {
+            // return list declared
+            List<int> averageScores = new List<int>();
+
+            // GetDepartments is called
+            List<string> departments = GetDepartments();
+
+            // a for loop executes multiple queries to get the average score of each department
+            for (int i = 0; i < departments.Count; i++)
+            {
+                int total = 0;
+                int count = 0;
+
+                string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
+                MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
+                MySqlCommand getAverages = new MySqlCommand($"Select Happiness FROM employees WHERE department = '{departments[i]}'", sqlConnection);
+                sqlConnection.Open();
+                MySqlDataReader reader = getAverages.ExecuteReader();
+
+                try
+                {
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            total = total + (int)reader["Happiness"];
+                            count++;
+                        }
+                    }
+                }
+
+                finally
+                {
+                    reader.Close();
+
+                    // averaged score is added to scores list
+                    averageScores.Add(total / count);
+                }
+            }
+
+            return averageScores;
+        } 
     }
 }
 
