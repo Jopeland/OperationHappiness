@@ -88,3 +88,24 @@ svg path {
     stroke-miterlimit: round;
     transition: stroke-dashoffset 850ms ease-in-out;
 }
+
+#searchbar{ 
+	width: 250px;
+	height: 20px;
+	margin-right: 25px;
+	border-radius: 25px;
+	background-color: rgba(255,255,255,0.7);		
+}
+
+#minScore, #maxScore, #sortFilter{ 
+	width: 100px;
+	height: 20px;
+	margin-right: 25px;
+	border-radius: 25px;
+	background-color: rgba(255,255,255,0.7);
+}
+
+#sortFilter {height: 30px;}
+
+
+#searchButton, #feedbackButton, #emailtodb, #loginButton {height: 30px; background-color: rgba(255,255,255,0.9);}
