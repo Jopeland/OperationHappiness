@@ -314,6 +314,7 @@ namespace happinessIndex.App_Start
             // variable to store HTML string to be appended using JS
             string html = "";
             string email = "";
+            string department =  "";
             int score = 50;
 
             // mostly the same code as VerifyCredentials
@@ -336,9 +337,10 @@ namespace happinessIndex.App_Start
                     {
                         email = (string)reader["Email"];
                         score = (int)reader["Happiness"];
+                        department = (string)reader["Department"];
 
                         int num = 1;
-                        html += "<tr><td class='email'>" + email + "</td><td class='score'>" + score + "</td></tr>";
+                        html += "<tr><td class='email'>" + email + "</td><td class='score'>" + score + "</td><td class='dept'>" + department + "</td></tr>";
                         num++;
                     }
 
@@ -470,6 +472,67 @@ namespace happinessIndex.App_Start
                         email.Send();
                     }
                 }
+            }
+        }
+
+        [WebMethod]
+        public string SearchEmployees (string input, int minScore, int maxScore, string order)
+        {
+            // variable to store HTML string to be appended using JS
+            string html = "";
+            string email = "";
+            string department = "";
+            int score = 0;
+            string sqlSelect;
+
+            // mostly the same code as VerifyCredentials
+            string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
+
+            // two different queries depending on if there is an input searched for or not (value of #)
+            if(input != "#")
+            {
+                sqlSelect = $"Select * FROM employees WHERE (Email LIKE'%{input}%' OR Department='{input}') AND Happiness BETWEEN {minScore} AND {maxScore} ORDER BY {order}";
+            }
+            else
+            {
+                sqlSelect = $"Select * FROM employees WHERE Happiness BETWEEN {minScore} AND {maxScore} ORDER BY {order}";
+            }
+
+            MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
+            MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
+            sqlConnection.Open();
+
+            MySqlDataReader reader = sqlCommand.ExecuteReader();
+
+            try
+            {
+                if (reader.HasRows)
+                {
+                    while (reader.Read())
+                    {
+                        email = (string)reader["Email"];
+                        score = (int)reader["Happiness"];
+                        department = (string)reader["Department"];
+
+                        int num = 1;
+                        html += "<tr><td class='email'>" + email + "</td><td class='score'>" + score + "</td><td class='dept'>" + department + "</td></tr>";
+                        num++;
+                    }
+
+                    return html;
+                }
+
+                else
+                {
+                    html = null;
+                    return html;
+                }
+            }
+
+            finally
+            {
+                reader.Close();
+                sqlConnection.Close();
             }
         }
     }

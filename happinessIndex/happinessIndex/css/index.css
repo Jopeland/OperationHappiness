@@ -63,7 +63,8 @@
     display: inline-block;
 }
 
-.data tr{
+.data thead tr,
+.data tbody tr {
     text-align: center;
     background-color: rgba(255,255,255,0.7);
     width: 95%;
@@ -71,12 +72,12 @@
     display: inline-block;
 }
 
-.data tr th{
+.data thead tr th{
     border-bottom: 1px solid black;
     padding-bottom: 5px;
 }
 
-.email, .score{
+.email, .score, .dept{
     width: 500px;
 	background-color: rgba(255,255,255,0.7);
 }

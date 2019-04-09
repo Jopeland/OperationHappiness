@@ -12,7 +12,7 @@
             var returnData = data.d;
 
             if (returnData != "") {
-                $("#tableData").append(returnData);
+                $("#tableBody").append(returnData);
             }
 
             else {
@@ -27,6 +27,7 @@
 
     document.getElementById("feedbackButton").addEventListener("click", sendFeedback);
     document.getElementById("emailtodb").addEventListener("click", saveEmail);
+    document.getElementById("searchButton").addEventListener("click", scoreSearch);
 
     //$(".data tr").each(function () {
     //   if(this.id != ""){
@@ -86,6 +87,60 @@ function saveEmail() {
         },
         error: function (e) {
             alert(data);
+        }
+    })
+}
+
+function scoreSearch() {
+    /* Deletes all table rows except for the header */
+    $("#tableBody tr").remove();
+    $("#error p").remove();
+
+   /* variables to store all of the inputs */
+    /* if input is null value is changed to "#" otherwise input is given the value of the field*/
+    if (document.getElementById("searchbar").value === "") {
+        input = "#";
+    }
+    else {
+        var input = document.getElementById("searchbar").value;
+    }
+    var minScore = document.getElementById("minScore").value;
+    var maxScore = document.getElementById("maxScore").value;
+    console.log(input);
+
+    /* for the ordering filter the chosen sort by and order are concatenated into a string */
+    var select = document.getElementById("sortFilter");
+    var category = select.options[select.selectedIndex].value;
+    var order = document.querySelector('input[name=order]:checked').value;
+
+    var orderBy = category + " " + order;
+
+    /* parameters are set */
+    var parameters = "{\"input\":\"" + encodeURI(input) + "\",\"minScore\":\"" + minScore + "\",\"maxScore\":\"" + maxScore + "\",\"order\":\"" + orderBy + "\"}"
+
+
+    $.ajax({
+        type: "POST",
+        data: parameters,
+        url: "../happinessServices.asmx/SearchEmployees",
+        contentType: "application/json;charset=utf-8",
+        dataType: "json",
+        success: function (data) {
+            var returnData = data.d;
+
+            if (returnData != null) {
+                $("#tableBody").append(returnData);
+                console.log("success");
+            }
+
+            else {
+                $("#error").append("<p>No records found</p>");
+                console.log("success");
+            }
+
+        },
+        error: function (e) {
+            alert("Error happens here");
         }
     })
 }
