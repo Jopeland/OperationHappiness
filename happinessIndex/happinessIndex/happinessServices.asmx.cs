@@ -5,6 +5,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using System.Text.RegularExpressions;
 using java.util;
 using java.io;
 using edu.stanford.nlp.pipeline;
@@ -97,7 +98,7 @@ namespace happinessIndex.App_Start
 
         //public async Task RetrieveEmails()
         //{ 
-         
+
         //    // variables to store email information
         //    string sender = "";
         //    string date = "";
@@ -263,7 +264,7 @@ namespace happinessIndex.App_Start
                 // a foreach loop goes through all of the messages, adds them to the database, and then marks them as read
                 foreach (Outlook.MailItem mail in messages)
                 {
-                    emails.Add(mail);                    
+                    emails.Add(mail);
                 }
 
                 for (int i = 0; i < emails.Count; i++)
@@ -317,7 +318,7 @@ namespace happinessIndex.App_Start
             // variable to store HTML string to be appended using JS
             string html = "";
             string email = "";
-            string department =  "";
+            string department = "";
             int score = 50;
 
             // mostly the same code as VerifyCredentials
@@ -390,7 +391,7 @@ namespace happinessIndex.App_Start
             // instantiating query that takes all of the individual emails in the scores table and puts them into the list
             string sqlSelect = $"Select DISTINCT UserEmail FROM scores";
 
-            MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString); 
+            MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
             MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
             sqlConnection.Open();
 
@@ -413,12 +414,12 @@ namespace happinessIndex.App_Start
                 if (emailList.Count > 0)
                 {
                     // A for loop loops through the list and passes it as an argument for a sql select
-                    for(int i = 0; i < emailList.Count; i++)
+                    for (int i = 0; i < emailList.Count; i++)
                     {
                         change = 0;
 
                         // SQL command takes only the top 2 results that the database contains
-                        MySqlCommand feedbackUsers = new MySqlCommand($"Select ScoreID, Score FROM scores WHERE UserEmail = '{emailList[i]}' ORDER BY ScoreID DESC LIMIT 2",sqlConnection);
+                        MySqlCommand feedbackUsers = new MySqlCommand($"Select ScoreID, Score FROM scores WHERE UserEmail = '{emailList[i]}' ORDER BY ScoreID DESC LIMIT 2", sqlConnection);
                         reader = feedbackUsers.ExecuteReader();
 
                         if (reader.HasRows)
@@ -426,7 +427,7 @@ namespace happinessIndex.App_Start
                             while (reader.Read())
                             {
                                 // if the change variable is 0, change is set equal to score
-                                if(change == 0)
+                                if (change == 0)
                                 {
                                     change = reader.GetInt32(reader.GetOrdinal("Score"));
                                 }
@@ -460,7 +461,7 @@ namespace happinessIndex.App_Start
             // foreach loops through and looks for scrumdaddiez@gmail.com and sets it to the sender account
             foreach (Outlook.Account account in accounts)
             {
-                if(account.SmtpAddress == "scrumdaddiez@gmail.com")
+                if (account.SmtpAddress == "scrumdaddiez@gmail.com")
                 {
                     // for every email address in the feedbackList, an email is sent
                     for (int i = 0; i < feedbackList.Count; i++)
@@ -479,7 +480,7 @@ namespace happinessIndex.App_Start
         }
 
         [WebMethod]
-        public string SearchEmployees (string input, int minScore, int maxScore, string order)
+        public string SearchEmployees(string input, int minScore, int maxScore, string order)
         {
             // variable to store HTML string to be appended using JS
             string html = "";
@@ -492,7 +493,7 @@ namespace happinessIndex.App_Start
             string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
 
             // two different queries depending on if there is an input searched for or not (value of #)
-            if(input != "#")
+            if (input != "#")
             {
                 sqlSelect = $"Select * FROM employees WHERE (Email LIKE'%{input}%' OR Department='{input}') AND Happiness BETWEEN {minScore} AND {maxScore} ORDER BY {order}";
             }
@@ -540,18 +541,18 @@ namespace happinessIndex.App_Start
         }
 
         [WebMethod]
-        public void SentimentAnalysis()
+        public int SentimentAnalysis(string entry)
         {
             // Path to the folder with models extracted from `stanford-corenlp-3.7.0-models.jar`
-            var jarRoot = @"\Users\Jake\Documents\CIS440\OperationHappiness\happinessIndex\happinessIndex\stanford-corenlp-3.7.0-models\edu\stanford\nlp\models";
+            var jarRoot = @"C:\Program Files (x86)\stanford-corenlp-full-2018-02-27\stanford-corenlp-3.9.1-models";
 
             // Text for processing
-            var text = "Kosgi Santosh sent an email to Stanford University. He didn't get a reply.";
+            var text = entry;
 
             // Annotation pipeline configuration
             var props = new Properties();
-            props.setProperty("annotators", "sentiment");
-            //props.setProperty("ner.useSUTime", "0");
+            props.setProperty("annotators", "tokenize,ssplit,pos,parse,sentiment");
+            props.setProperty("ner.useSUTime", "0");
 
             // We should change current directory, so StanfordCoreNLP could find all the model files automatically
             var curDir = Environment.CurrentDirectory;
@@ -563,14 +564,32 @@ namespace happinessIndex.App_Start
             var annotation = new Annotation(text);
             pipeline.annotate(annotation);
 
+            var stream = new ByteArrayOutputStream();
+
             // Result - Pretty Print
-            using (var stream = new ByteArrayOutputStream())
+            using (stream)
             {
                 pipeline.prettyPrint(annotation, new PrintWriter(stream));
                 System.Console.WriteLine(stream.toString());
                 stream.close();
             }
+
+            Regex total = new Regex(@"(sentiment:)");
+            Regex pos = new Regex(@"(sentiment: Positive)");
+            Regex neg = new Regex(@"(sentiment: Negative)");
+            Regex neu = new Regex(@"(sentiment: Neutral)");
+
+            string final = stream.ToString();
+
+            MatchCollection totalMatch = total.Matches(final);
+            MatchCollection posMatch = pos.Matches(final);
+            MatchCollection negMatch = neg.Matches(final);
+            MatchCollection neuMatch = neu.Matches(final);
+
+            int sentiment = posMatch.Count + (-1 * negMatch.Count);
+
+
+            return sentiment;
         }
     }
 }
-
