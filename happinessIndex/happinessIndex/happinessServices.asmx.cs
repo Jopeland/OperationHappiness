@@ -21,6 +21,8 @@ using System.Data;
 //using Google.Apis.Util.Store;
 using System.Text;
 using System.Reflection;
+using System.Web.Script.Services;
+using System.Web.Script.Serialization;
 
 namespace happinessIndex.App_Start
 {
@@ -537,7 +539,8 @@ namespace happinessIndex.App_Start
         }
 
         [WebMethod]
-        public List<string> GetDepartments()
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public string GetDepartmentAverage()
         {
             // list to store departments
             List<string> departments = new List<string>();
@@ -568,18 +571,8 @@ namespace happinessIndex.App_Start
                 reader.Close();
             }
 
-            return departments;
-
-        }
-
-        [WebMethod]
-        public List<int> GetAverageScores()
-        {
-            // return list declared
+            // scores list declared
             List<int> averageScores = new List<int>();
-
-            // GetDepartments is called
-            List<string> departments = GetDepartments();
 
             // a for loop executes multiple queries to get the average score of each department
             for (int i = 0; i < departments.Count; i++)
@@ -587,11 +580,8 @@ namespace happinessIndex.App_Start
                 int total = 0;
                 int count = 0;
 
-                string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
-                MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
                 MySqlCommand getAverages = new MySqlCommand($"Select Happiness FROM employees WHERE department = '{departments[i]}'", sqlConnection);
-                sqlConnection.Open();
-                MySqlDataReader reader = getAverages.ExecuteReader();
+                reader = getAverages.ExecuteReader();
 
                 try
                 {
@@ -614,8 +604,31 @@ namespace happinessIndex.App_Start
                 }
             }
 
-            return averageScores;
-        } 
+            sqlConnection.Close();
+
+            // list for all values values 
+            List<string[,]> values = new List<string[,]>();
+
+            // for loop adds everything into the array
+            for (int i = 0; i < departments.Count; i++)
+            {
+                // array for individual values
+                string[,] iValues = new string[1,2];
+
+                iValues[0,0] = departments[i];
+                iValues[0,1] = averageScores[i].ToString();
+
+                values.Add(iValues);
+            }
+
+            //JSON serializer
+            JavaScriptSerializer js = new JavaScriptSerializer();
+            string json = js.Serialize(values);
+
+            // json is returned
+            return json;
+
+        }
     }
 }
 

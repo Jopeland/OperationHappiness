@@ -8,90 +8,47 @@ google.charts.setOnLoadCallback(drawChart);
 // instantiates the pie chart, passes in the data and
 // draws it.
 function drawChart() {
-
-    //// Create the data table.
-    //var data = new google.visualization.DataTable();
-    //data.addColumn('string', 'Topping');
-    //data.addColumn('number', 'Slices');
-    //data.addRows([
-    //    ['Mushrooms', 3],
-    //    ['Onions', 1],
-    //    ['Olives', 1],
-    //    ['Zucchini', 1],
-    //    ['Pepperoni', 2]
-    //]);
-
-    //// Set chart options
-    //var options = {
-    //    'title': 'How Much Pizza I Ate Last Night',
-    //    'width': 400,
-    //    'height': 300
-    //};
-
-    //// Instantiate and draw our chart, passing in some options.
-    //var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
-    //chart.draw(data, options);
-
     getDeptHealth();
 }
 
+/*functions to get the average scores of each department and draw a bar graph with them */
 function getDeptHealth() {
 
-    /* Getting google charts ready */
-    var tableData = new google.visualization.DataTable();
-    tableData.addColumn('string', 'Department');
-    tableData.addColumn('number', 'Avg Score');
-
-    /* declaring arrays */
-    var departments = [];
-    var scores = [];
+    var results = new Array();
 
     $.ajax({
         type: "POST",
-        url: "../happinessServices.asmx/GetDepartments",
+        url: "../happinessServices.asmx/GetDepartmentAverage",
         contentType: "application/json;charset=utf-8",
         dataType: "json",
         success: function (data) {
-            /* loops through data.d to get all array values and puts them into departments */
-            for (var i = 0; i < data.d.length; i++) {
-                departments[i] = String(data.d[i]);
-                console.log(JSON.stringify(data).dataType);
+            alert(JSON.parse(data.d));
+
+            results = JSON.parse(data.d);
+            console.log(results);
+
+            /* Getting google charts ready */
+            var tableData = new google.visualization.DataTable();
+            tableData.addColumn('string', 'Department');
+            tableData.addColumn('number', 'Avg Score');
+
+            for (var i = 0; i < results.length; i++) {
+                tableData.addRow([results[i][0], Number(results[i][1])]);
             }
+
+            // Set chart options
+            var options = {
+                'title': 'Average Score By Department',
+                'width': 700,
+                'height': 500
+            };
+
+            // Instantiate and draw our chart, passing in some options.
+            var chart = new google.visualization.BarChart(document.getElementById('chart_div'));
+            chart.draw(tableData, options);
         },
         error: function (e) {
             alert("Error happens here");
         }
     })
-
-    $.ajax({
-        type: "POST",
-        url: "../happinessServices.asmx/GetAverageScores",
-        contentType: "application/json;charset=utf-8",
-        dataType: "json",
-        success: function (data) {
-            for (var i = 0; i < data.d.length; i++) {
-                scores[i] = Number(data.d[i]);
-            }
-        },
-        error: function (e) {
-            alert("Error happens here");
-        }
-    })
-
-    for (var i = 0; i < departments.length; i++) {
-        tableData.addRow(departments[i], scores[i]);
-        console.log(departments[i]);
-        console.log(scores[i]);
-    }
-
-    // Set chart options
-    var options = {
-        'title': 'Average Score By Department',
-        'width': 700,
-        'height': 500
-    };
-
-    // Instantiate and draw our chart, passing in some options.
-    var chart = new google.visualization.BarChart(document.getElementById('chart_div'));
-    chart.draw(tableData, options);
 }
