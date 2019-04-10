@@ -617,10 +617,10 @@ namespace happinessIndex.App_Start
             for (int i = 0; i < departments.Count; i++)
             {
                 // array for individual values
-                string[,] iValues = new string[1,2];
+                string[,] iValues = new string[1, 2];
 
-                iValues[0,0] = departments[i];
-                iValues[0,1] = averageScores[i].ToString();
+                iValues[0, 0] = departments[i];
+                iValues[0, 1] = averageScores[i].ToString();
 
                 values.Add(iValues);
             }
@@ -633,8 +633,6 @@ namespace happinessIndex.App_Start
             return json;
 
         }
-    }
-}
 
         [WebMethod]
         public int SentimentAnalysis(string entry)
