@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
@@ -721,15 +722,15 @@ namespace happinessIndex.App_Start
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         public string GetHappinessOverTime()
         {
-            // List of a list of strings is taken to be converted to a json string is created
-            List<List<string>> values = new List<List<string>>();
+            // List of ArrayLists is taken to be converted to a json string is created
+            List<System.Collections.ArrayList> values = new List<System.Collections.ArrayList>();
 
             string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
             MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
 
             // A query similar to that one in GetDepartmentHealth gets each department to serve as the header row of the datatable
             // First a list is declared to take these values, starting with date
-            List<string> header = new List<string>();
+            System.Collections.ArrayList header = new System.Collections.ArrayList();
             header.Add("Date");
 
             string selectDepartments = $"Select DISTINCT Department FROM employees ORDER BY Department DESC";
@@ -769,10 +770,10 @@ namespace happinessIndex.App_Start
                 MySqlDataReader reader = sqlCommand.ExecuteReader();
 
                 // a list of strings is declared to take in all of the values
-                List<string> queryOutput = new List<string>();
+                System.Collections.ArrayList queryOutput = new System.Collections.ArrayList();
 
                 // The first value added into the list is a string of the date from however many days ago is being take
-                queryOutput.Add(DateTime.Today.AddDays(-i).Date.ToString("MM-dd-yyyy"));
+                queryOutput.Add(DateTime.Today.AddDays(-i).Date.ToString("MM-dd-yy"));
 
                 int total = 0; // takes running total for overall average
 
@@ -783,14 +784,14 @@ namespace happinessIndex.App_Start
                         while (reader.Read())
                         {
                             // the average scores are added to the queryOutput list
-                            queryOutput.Add(reader["avgscore"].ToString());
+                            queryOutput.Add(reader["avgscore"]);
 
                             // running total is kept
                             total = total + Convert.ToInt32(reader["avgscore"]);
                         }
 
                         // total is added to the queryOutput list as a string
-                        queryOutput.Add((total / (queryOutput.Count - 1)).ToString());
+                        queryOutput.Add((total / (queryOutput.Count - 1)));
 
                         // queryOutput is put into values
                         values.Add(queryOutput);
@@ -811,8 +812,8 @@ namespace happinessIndex.App_Start
             MySqlDataReader todayReader = todayAverage.ExecuteReader();
 
             // List for today's values, first the date as usual
-            List<string> today = new List<string>();
-            today.Add(DateTime.Today.Date.ToString("MM-dd-yyyy"));
+            System.Collections.ArrayList today = new System.Collections.ArrayList();
+            today.Add(DateTime.Today.Date.ToString("MM-dd-yy"));
             int todayTotal = 0;
 
             try
@@ -822,14 +823,14 @@ namespace happinessIndex.App_Start
                     while (todayReader.Read())
                     {
                         // the average scores are added to the queryOutput list
-                        today.Add(todayReader["avgscore"].ToString());
+                        today.Add(todayReader["avgscore"]);
 
                         // running total is kept
                         todayTotal = todayTotal + Convert.ToInt32(todayReader["avgscore"]);
                     }
 
                     // total is added to the queryOutput list as a string
-                    today.Add((todayTotal / (today.Count - 1)).ToString());
+                    today.Add((todayTotal / (today.Count - 1)));
 
                     // queryOutput is put into values
                     values.Add(today);

@@ -8,6 +8,7 @@ google.charts.setOnLoadCallback(buildDashboard);
 function buildDashboard() {
     avgByDept();
     overallHappiness();
+    happinessOverTime();
 }
 
 /*function to create a columnchart of average score by department */
@@ -94,7 +95,28 @@ function happinessOverTime() {
         contentType: "application/json;charset=utf-8",
         dataType: "json",
         success: function (data) {
-            console.log(data.d);
+            var results = JSON.parse(data.d);
+
+            /* Google arrayToDataTable is used to put json output into array for line chart */
+            var lineData = new google.visualization.arrayToDataTable(results);
+            var options = {
+                title: 'Department Health Last Two Weeks',
+                legend: { position: 'right' },
+                vAxis: {
+                    title: 'Average Score',
+                    viewWindow: { max: 100, min: 0 }
+                },
+                hAxis: {
+                    title: 'Date',
+                    slantedText: true,
+                    slantedTextAngle: 45
+                },
+                height: 800,
+                width: 1000,
+            }
+
+            var lineChart = new google.visualization.LineChart(document.getElementById('line_div'));
+            lineChart.draw(lineData, options);
         },
         error: function (e) {
             alert("Error happens here");
