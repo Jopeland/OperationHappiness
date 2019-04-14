@@ -225,6 +225,7 @@
     <Content Include="Global.asax" />
     <Content Include="html\account.html" />
     <Content Include="html\dashboard.html" />
+    <Content Include="html\feedbackPrompt.html" />
     <Content Include="index.html" />
     <Content Include="js\account.js" />
     <Content Include="js\dashboard.js" />
