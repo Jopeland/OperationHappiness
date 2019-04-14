@@ -80,6 +80,9 @@ function overallHappiness() {
 
             var gauge = new google.visualization.Gauge(document.getElementById('gauge_div'));
             gauge.draw(gaugeData, options);
+        },
+        error: function (e) {
+            alert("Error happens here");
         }
     })
 }
@@ -91,7 +94,10 @@ function happinessOverTime() {
         contentType: "application/json;charset=utf-8",
         dataType: "json",
         success: function (data) {
-
+            console.log(data.d);
+        },
+        error: function (e) {
+            alert("Error happens here");
         }
     })
 }
