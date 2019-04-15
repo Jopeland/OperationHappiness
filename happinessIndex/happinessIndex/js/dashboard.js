@@ -1,19 +1,18 @@
 ﻿// Load the Visualization API and the corechart package.
-google.charts.load('current', { 'packages': ['corechart'] });
+google.charts.load('current', { 'packages': ['corechart','controls','gauge','bar','line'] });
 
 // Set a callback to run when the Google Visualization API is loaded.
-google.charts.setOnLoadCallback(drawChart);
+google.charts.setOnLoadCallback(buildDashboard);
 
-// Callback that creates and populates a data table,
-// instantiates the pie chart, passes in the data and
-// draws it.
-function drawChart() {
-    getDeptHealth();
+// this function builds each of the individual graphs needed to create the dashboard
+function buildDashboard() {
+    avgByDept();
+    overallHappiness();
+    happinessOverTime();
 }
 
-/*functions to get the average scores of each department and draw a bar graph with them */
-function getDeptHealth() {
-
+/*function to create a columnchart of average score by department */
+function avgByDept() {
     var results = new Array();
 
     $.ajax({
@@ -22,8 +21,6 @@ function getDeptHealth() {
         contentType: "application/json;charset=utf-8",
         dataType: "json",
         success: function (data) {
-            alert(JSON.parse(data.d));
-
             results = JSON.parse(data.d);
             console.log(results);
 
@@ -38,14 +35,88 @@ function getDeptHealth() {
 
             // Set chart options
             var options = {
-                'title': 'Average Score By Department',
-                'width': 700,
-                'height': 500
+                title: 'Average Score By Department',
+                width: 800,
+                height: 500,
+                vAxis: {
+                    viewWindow: { max: 100, min: 0 }
+                }
             };
 
-            // Instantiate and draw our chart, passing in some options.
-            var chart = new google.visualization.BarChart(document.getElementById('chart_div'));
+            // The chart variable is returned for use in buildDashboard
+            var chart = new google.visualization.ColumnChart(document.getElementById('barchart_div'));
             chart.draw(tableData, options);
+        },
+        error: function (e) {
+            alert("Error happens here");
+        }
+    })
+}
+
+function overallHappiness() {
+    $.ajax({
+        type: "POST",
+        url: "../happinessServices.asmx/GetOverallHappiness",
+        contentType: "application/json;charset=utf-8",
+        dataType: "json",
+        success: function (data) {
+            var results = Number(data.d);
+
+            var gaugeData = google.visualization.arrayToDataTable([
+                ['Label', 'Value'],
+                ['Overall Health', results]
+            ]);
+
+            var options = {
+                width: 600,
+                height: 400,
+                redFrom: 0,
+                redTo: 35,
+                greenFrom: 50,
+                greenTo: 100,
+                yellowFrom: 35,
+                yellowTo: 50,
+                minorTicks: 5
+            };
+
+            var gauge = new google.visualization.Gauge(document.getElementById('gauge_div'));
+            gauge.draw(gaugeData, options);
+        },
+        error: function (e) {
+            alert("Error happens here");
+        }
+    })
+}
+
+function happinessOverTime() {
+    $.ajax({
+        type: "POST",
+        url: "../happinessServices.asmx/GetHappinessOverTime",
+        contentType: "application/json;charset=utf-8",
+        dataType: "json",
+        success: function (data) {
+            var results = JSON.parse(data.d);
+
+            /* Google arrayToDataTable is used to put json output into array for line chart */
+            var lineData = new google.visualization.arrayToDataTable(results);
+            var options = {
+                title: 'Department Health Last Two Weeks (Click Line or Key to see individual department)',
+                legend: { position: 'right' },
+                vAxis: {
+                    title: 'Average Score',
+                    viewWindow: { max: 100, min: 0 }
+                },
+                hAxis: {
+                    title: 'Date',
+                    slantedText: true,
+                    slantedTextAngle: 45
+                },
+                height: 600,
+                width: 1000,
+            }
+
+            var lineChart = new google.charts.Line(document.getElementById('line_div'));
+            lineChart.draw(lineData, google.charts.Line.convertOptions(options));
         },
         error: function (e) {
             alert("Error happens here");

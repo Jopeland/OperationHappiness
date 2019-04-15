@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
@@ -684,6 +685,170 @@ namespace happinessIndex.App_Start
 
 
             return sentiment;
+        }
+
+        [WebMethod]
+        public int GetOverallHappiness()
+        {
+            // Query gets the average of all the scores in the employees table and returns an integer so its rounded and nice
+            int average = 0;
+
+            // SQL connections and query
+            string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
+
+            string sqlSelect = $"Select AVG(Happiness) FROM employees";
+
+            MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
+            MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
+            sqlConnection.Open();
+            MySqlDataReader reader = sqlCommand.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    average = Convert.ToInt32(reader["AVG(Happiness)"]);
+                }
+            }
+
+            // close connection
+            reader.Close();
+            sqlConnection.Close();
+
+            return average;
+        }
+
+        [WebMethod]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public string GetHappinessOverTime()
+        {
+            // List of ArrayLists is taken to be converted to a json string is created
+            List<System.Collections.ArrayList> values = new List<System.Collections.ArrayList>();
+
+            string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
+            MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
+
+            // A query similar to that one in GetDepartmentHealth gets each department to serve as the header row of the datatable
+            // First a list is declared to take these values, starting with date
+            System.Collections.ArrayList header = new System.Collections.ArrayList();
+            header.Add("Date");
+
+            string selectDepartments = $"Select DISTINCT Department FROM employees ORDER BY Department DESC";
+            MySqlCommand getDepartments = new MySqlCommand(selectDepartments, sqlConnection);
+            sqlConnection.Open();
+            MySqlDataReader deptReader = getDepartments.ExecuteReader();
+
+            try
+            {
+                if (deptReader.HasRows)
+                {
+                    while (deptReader.Read())
+                    {
+                        // Each department is added to the list of departments for the header
+                        header.Add((string)deptReader["Department"]);
+                    }
+
+                    // Lastly, All is added to values as the final header
+                    header.Add("All");
+
+                    // the header is added to values
+                    values.Add(header);
+                }
+            }
+            finally
+            {
+                deptReader.Close();
+                sqlConnection.Close();
+            }
+
+            // A query will loop through and perform 14 queries -- each of the last 14 days
+            for (int i = 14; i > 0; i--)
+            {
+                string sqlSelect = $"SELECT e.Department, ROUND(avg(s.Score)) AS avgscore FROM Employees e, Scores s Where e.Email = s.UserEmail AND DATE(s.Date) = DATE_SUB(CURRENT_DATE(), INTERVAL {i} DAY) GROUP BY e.Department Order BY e.Department DESC";
+                MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
+                sqlConnection.Open();
+                MySqlDataReader reader = sqlCommand.ExecuteReader();
+
+                // a list of strings is declared to take in all of the values
+                System.Collections.ArrayList queryOutput = new System.Collections.ArrayList();
+
+                // The first value added into the list is a string of the date from however many days ago is being take
+                queryOutput.Add(DateTime.Today.AddDays(-i).Date.ToString("MM-dd-yy"));
+
+                int total = 0; // takes running total for overall average
+
+                try
+                {
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            // the average scores are added to the queryOutput list
+                            queryOutput.Add(reader["avgscore"]);
+
+                            // running total is kept
+                            total = total + Convert.ToInt32(reader["avgscore"]);
+                        }
+
+                        // total is added to the queryOutput list as a string
+                        queryOutput.Add((total / (queryOutput.Count - 1)));
+
+                        // queryOutput is put into values
+                        values.Add(queryOutput);
+                    }
+                }
+
+                finally
+                {
+                    reader.Close();
+                    sqlConnection.Close();
+                }
+            }
+
+            // Next a list of the values for today are queried for and added to their own list which is added to values
+            string getToday = $"SELECT e.Department, ROUND(avg(s.Score)) AS avgscore FROM Employees e, Scores s Where e.Email = s.UserEmail AND DATE(s.Date) = CURRENT_DATE() GROUP BY e.Department Order BY e.Department";
+            MySqlCommand todayAverage = new MySqlCommand(getToday, sqlConnection);
+            sqlConnection.Open();
+            MySqlDataReader todayReader = todayAverage.ExecuteReader();
+
+            // List for today's values, first the date as usual
+            System.Collections.ArrayList today = new System.Collections.ArrayList();
+            today.Add(DateTime.Today.Date.ToString("MM-dd-yy"));
+            int todayTotal = 0;
+
+            try
+            {
+                if (todayReader.HasRows)
+                {
+                    while (todayReader.Read())
+                    {
+                        // the average scores are added to the queryOutput list
+                        today.Add(todayReader["avgscore"]);
+
+                        // running total is kept
+                        todayTotal = todayTotal + Convert.ToInt32(todayReader["avgscore"]);
+                    }
+
+                    // total is added to the queryOutput list as a string
+                    today.Add((todayTotal / (today.Count - 1)));
+
+                    // queryOutput is put into values
+                    values.Add(today);
+                }
+            }
+            finally
+            {
+                todayReader.Close();
+                sqlConnection.Close();
+            }
+
+            // Values is converted to a json string
+            //JSON serializer
+            JavaScriptSerializer js = new JavaScriptSerializer();
+            string json = js.Serialize(values);
+
+            // json is returned
+            return json;
         }
     }
 }
