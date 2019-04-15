@@ -16,18 +16,51 @@
     background-size: 0;
 }
 
-#header {
-    background-color: rgba(255,255,255,0.7);
+header {
+    background-color: white;
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 66px;
+    margin-bottom: 5%;
+    display: inline-block;
+}
+header .logo{
+    padding-left: 2%;
+    margin-right: 3%;
+    display: inline-block;
+}
+header .nav {
+    list-style-type: none;
     margin: 0;
-    padding: 0;
-    padding-left: 15px;
-    height: 60px;
+    padding: 10px 0px 20px 0px;
+    letter-spacing: 1.6px;
+    display: inline-block;
+}
+    header .nav li, header .nav li a {
+        display: inline-block;
+        text-decoration: none;
+        transition: 0.4s;
+        color: #0e2e49;
+        font-family: 'Gotham',Arial, sans-serif;
+        font-weight: 600;
+        font-size: 16px;
+        margin-right: 25px;
+        text-transform: uppercase;
+        height: 100%;
+    }
+.nav li a:hover {
+    background-color: #0e2e49;
+    height:35px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    padding:10px 10px 0 10px;
+    margin-top:0;
 }
 
-.title {
-    vertical-align: middle;
-    font-family: Papyrus, cursive;
-}
 
 .form {
     text-align: center;
@@ -82,12 +115,12 @@
 	background-color: rgba(255,255,255,0.7);
 }
 
-svg path {
+/*svg path {
     will-change: auto;
     stroke-width: 20px;
     stroke-miterlimit: round;
     transition: stroke-dashoffset 850ms ease-in-out;
-}
+}*/
 
 #searchbar{ 
 	width: 250px;
@@ -109,3 +142,4 @@ svg path {
 
 
 #searchButton, #feedbackButton, #emailtodb, #loginButton {height: 30px; background-color: rgba(255,255,255,0.9);}
+
