@@ -283,6 +283,20 @@ namespace happinessIndex.App_Start
                     // if the 4 strings are not empty, the email is added to the emails database(just for testing, this isnt the permanent solution for now)
                     if (sender != null && date != null && subject != null && body != null)
                     {
+                        // passing email body into sentiment analysis
+                        int sentiment = SentimentAnalysis(body);
+
+                        if (sentiment >= 6)
+                            sentiment = 2;
+                        else if (sentiment >= 1)
+                            sentiment = 1;
+                        else if (sentiment == 0)
+                            sentiment = 0;
+                        else if (sentiment <= -6)
+                            sentiment = -2;
+                        else
+                            sentiment = -1;
+
                         // grabbing connection string from config file
                         string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
 
@@ -290,27 +304,51 @@ namespace happinessIndex.App_Start
                         MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
                         sqlConnection.Open();
 
+                        // getting current score and editing
+                        MySqlCommand getScore = new MySqlCommand($"SELECT * FROM employees where Email = {sender}", sqlConnection);
+                        MySqlDataReader reader = getScore.ExecuteReader();
+
+
+                        int score = 0;
+                        try
+                        {
+                            if (reader.HasRows)
+                            {
+                                while (reader.Read())
+                                {
+                                    score = sentiment + (int)reader["Happiness"];
+                                }
+                            }
+                            else
+                            {
+                                score = 0;
+                            }
+                        }
+                        finally
+                        {
+                            reader.Close();
+                        }
+                        
                         // instantiating new command
-                        MySqlCommand addEmail = new MySqlCommand("INSERT INTO Emails(Sender,Date,Subject,Body) VALUES(@sender,@date,@subject,@body)", sqlConnection);
+                        MySqlCommand addScore = new MySqlCommand("INSERT INTO Scores(UserEmail,Date,Score) VALUES(@sender,@date,@score)", sqlConnection);
 
                         // assigning values
-                        addEmail.Parameters.AddWithValue("@sender", sender);
-                        addEmail.Parameters.AddWithValue("@date", DateTime.Parse(date));
-                        addEmail.Parameters.AddWithValue("@subject", subject);
-                        addEmail.Parameters.AddWithValue("@body", body);
+                        addScore.Parameters.AddWithValue("@sender", sender);
+                        addScore.Parameters.AddWithValue("@date", DateTime.Parse(date));
+                        addScore.Parameters.AddWithValue("@score", score);
 
                         // running command
-                        addEmail.ExecuteNonQuery();
+                        addScore.ExecuteNonQuery();
 
                         sqlConnection.Close();
                     }
 
                 }
-                return "Worked";
+                return "Sentiment Analyzed";
             }
             catch
             {
-                return "Failed";
+                return "Email Sentiment Analysis Failed";
             }
         }
 
