@@ -1,5 +1,5 @@
 ﻿// Load the Visualization API and the corechart package.
-google.charts.load('current', { 'packages': ['corechart','controls','gauge','bar'] });
+google.charts.load('current', { 'packages': ['corechart','controls','gauge','bar','line'] });
 
 // Set a callback to run when the Google Visualization API is loaded.
 google.charts.setOnLoadCallback(buildDashboard);
@@ -100,7 +100,7 @@ function happinessOverTime() {
             /* Google arrayToDataTable is used to put json output into array for line chart */
             var lineData = new google.visualization.arrayToDataTable(results);
             var options = {
-                title: 'Department Health Last Two Weeks',
+                title: 'Department Health Last Two Weeks (Click Line or Key to see individual department)',
                 legend: { position: 'right' },
                 vAxis: {
                     title: 'Average Score',
@@ -111,12 +111,12 @@ function happinessOverTime() {
                     slantedText: true,
                     slantedTextAngle: 45
                 },
-                height: 800,
+                height: 600,
                 width: 1000,
             }
 
-            var lineChart = new google.visualization.LineChart(document.getElementById('line_div'));
-            lineChart.draw(lineData, options);
+            var lineChart = new google.charts.Line(document.getElementById('line_div'));
+            lineChart.draw(lineData, google.charts.Line.convertOptions(options));
         },
         error: function (e) {
             alert("Error happens here");
