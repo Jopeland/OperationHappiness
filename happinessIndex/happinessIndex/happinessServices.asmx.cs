@@ -379,7 +379,7 @@ namespace happinessIndex.App_Start
 
             // strings to contain the parts of the message
             string subject = "Feedback Survey Request";
-            string body = "Hi.  We would like to hear about how work has been for you recently. Please click this link to take the survey: http://www.usaa.com";
+            string body = "Hi.  We would like to hear about how work has been for you recently. Please click this link to take the survey: http://localhost:59277/html/feedbackPrompt.html";
 
             // integer for score change
             int change;
@@ -849,6 +849,36 @@ namespace happinessIndex.App_Start
 
             // json is returned
             return json;
+        }
+
+        [WebMethod]
+        public bool CollectFeedback(string email, string mRecs, string mChange, string dFixed, string hComms, string comments)
+        {
+            try
+            {
+                string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
+                MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
+                sqlConnection.Open();
+                // insert statement
+                MySqlCommand insertFeedback = new MySqlCommand("INSERT INTO `responses`(`userEmail`, `mRecs`, `mChange`, `dFixes`, `hComms`, `comments`) VALUES (@email,@mRecs,@mChange,@dFixed,@hComms,@comments)", sqlConnection);
+
+                // parameters added
+                insertFeedback.Parameters.AddWithValue("@email", email);
+                insertFeedback.Parameters.AddWithValue("@mRecs", mRecs);
+                insertFeedback.Parameters.AddWithValue("@mChange", mChange);
+                insertFeedback.Parameters.AddWithValue("@dFixed", dFixed);
+                insertFeedback.Parameters.AddWithValue("@hComms", hComms);
+                insertFeedback.Parameters.AddWithValue("@comments", comments);
+
+                insertFeedback.ExecuteNonQuery();
+                sqlConnection.Close();
+
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
     }
 }
