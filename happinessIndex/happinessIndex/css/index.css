@@ -71,6 +71,7 @@ header .nav {
 
 .main{
     text-align: center;
+    color: white;
 }
 
 .info {
@@ -119,6 +120,10 @@ header .nav {
     transition: stroke-dashoffset 850ms ease-in-out;
 }*/
 
+.search {
+    color: white;
+}
+
 #searchbar{ 
 	width: 250px;
 	height: 20px;
@@ -148,4 +153,13 @@ header .nav {
 .main .dashboard{
     padding-left: 10%;
     margin-bottom: 3%;
+}
+
+.adminFunctions{
+    line-height: 20px;
+    color: white;
+}
+
+.adminFunctions input{
+    margin: 5px 20px 20px 0px;
 }
