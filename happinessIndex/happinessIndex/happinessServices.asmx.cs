@@ -244,6 +244,8 @@ namespace happinessIndex.App_Start
         [WebMethod]
         public string RetrieveEmails()
         {
+            string notice = "";
+
             // string variables declared to store parts of the message
             string sender;
             string date;
@@ -270,6 +272,8 @@ namespace happinessIndex.App_Start
                     emails.Add(mail);
                 }
 
+                notice += $"Email count: {emails.Count}. ";
+
                 for (int i = 0; i < emails.Count; i++)
                 {
                     emails[i].UnRead = false;
@@ -280,37 +284,90 @@ namespace happinessIndex.App_Start
                     subject = emails[i].Subject;
                     body = emails[i].Body;
 
+                    notice += $"Email collected: {sender}, {date}, {subject}, {body}. ";
+
                     // if the 4 strings are not empty, the email is added to the emails database(just for testing, this isnt the permanent solution for now)
                     if (sender != null && date != null && subject != null && body != null)
                     {
+
+                        notice += $"Email matches parameters. ";
+                        // passing email body into sentiment analysis
+                        int sentiment = SentimentAnalysis(body);
+
+                        notice += $"Sentmient Analysis run {sentiment}.  ";
+
+                        if (sentiment >= 6)
+                            sentiment = 2;
+                        else if (sentiment >= 1)
+                            sentiment = 1;
+                        else if (sentiment == 0)
+                            sentiment = 0;
+                        else if (sentiment <= -6)
+                            sentiment = -2;
+                        else
+                            sentiment = -1;
+
+                        notice += $"Sentiment level altered: {sentiment}. ";
+
                         // grabbing connection string from config file
                         string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
 
+                        string sqlSelect = $"SELECT * FROM employees where Email = '{sender}'";
+
                         // set up our connection object to be ready to use our connection string
                         MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
+                        MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
                         sqlConnection.Open();
+                        MySqlDataReader reader = sqlCommand.ExecuteReader();
+
+                        notice += $"Reader initiated. ";
+
+
+                        int score = 0;
+                        try
+                        {
+                            if (reader.HasRows)
+                            {
+                                while (reader.Read())
+                                {
+                                    notice += $"Sentiment = {sentiment} and Current = {(int)reader["Happiness"]}. ";
+                                    score = sentiment + (int)reader["Happiness"];
+                                    notice += $"Score analyzed = {score}. ";
+                                }
+                            }
+                            else
+                            {
+                                score = 0;
+                            }
+                        }
+                        finally
+                        {
+                            reader.Close();
+                        }
+
 
                         // instantiating new command
-                        MySqlCommand addEmail = new MySqlCommand("INSERT INTO Emails(Sender,Date,Subject,Body) VALUES(@sender,@date,@subject,@body)", sqlConnection);
+                        MySqlCommand addScore = new MySqlCommand("INSERT INTO Scores(UserEmail,Date,Score) VALUES(@sender,@date,@score)", sqlConnection);
 
                         // assigning values
-                        addEmail.Parameters.AddWithValue("@sender", sender);
-                        addEmail.Parameters.AddWithValue("@date", DateTime.Parse(date));
-                        addEmail.Parameters.AddWithValue("@subject", subject);
-                        addEmail.Parameters.AddWithValue("@body", body);
+                        addScore.Parameters.AddWithValue("@sender", sender);
+                        addScore.Parameters.AddWithValue("@date", DateTime.Parse(date));
+                        addScore.Parameters.AddWithValue("@score", score);
 
                         // running command
-                        addEmail.ExecuteNonQuery();
+                        addScore.ExecuteNonQuery();
+
+                        notice += "Inserted into scores DB.";
 
                         sqlConnection.Close();
                     }
 
                 }
-                return "Worked";
+                return notice;
             }
             catch
             {
-                return "Failed";
+                return notice;
             }
         }
 
@@ -806,7 +863,7 @@ namespace happinessIndex.App_Start
             }
 
             // Next a list of the values for today are queried for and added to their own list which is added to values
-            string getToday = $"SELECT e.Department, ROUND(avg(s.Score)) AS avgscore FROM Employees e, Scores s Where e.Email = s.UserEmail AND DATE(s.Date) = CURRENT_DATE() GROUP BY e.Department Order BY e.Department";
+            string getToday = $"SELECT e.Department, ROUND(avg(s.Score)) AS avgscore FROM Employees e, Scores s Where e.Email = s.UserEmail AND DATE(s.Date) = CURRENT_DATE() GROUP BY e.Department Order BY e.Department DESC";
             MySqlCommand todayAverage = new MySqlCommand(getToday, sqlConnection);
             sqlConnection.Open();
             MySqlDataReader todayReader = todayAverage.ExecuteReader();

@@ -1,33 +1,63 @@
 ﻿body {
-    background-color: rgba(56, 182, 230, 0.62);
-	font-family: 'Open Sans', Helvetica, Arial, sans-serif;
-    margin:0;
-    padding: 0;
-    height:100%;
-    background-size: 0;
-}
-
-#account {
-    background-color: rgba(237, 84, 76, 0.62);
-	font-family: 'Open Sans', Helvetica, Arial, sans-serif;
-    margin:0;
-    padding: 0;
-    height:100%;
-    background-size: 0;
-}
-
-#header {
-    background-color: rgba(255,255,255,0.7);
+    background-color: #0e2e49;
+    font-family: 'Open Sans', Helvetica, Arial, sans-serif;
     margin: 0;
     padding: 0;
-    padding-left: 15px;
-    height: 60px;
+    height: 100%;
+    background-size: 0;
 }
 
-.title {
-    vertical-align: middle;
-    font-family: Papyrus, cursive;
+header {
+    background-color: white;
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 66px;
+    max-height: 66px;
+    margin-bottom: 5%;
+    display: inline-block;
 }
+header .logo{
+    padding-left: 2%;
+    margin-right: 3%;
+    max-height:inherit;
+    display: inline-block;
+}
+header .nav {
+    list-style-type: none;
+    margin: 0;
+    padding-top: 10px;
+    letter-spacing: 1.6px;
+    display: inline;
+    vertical-align: middle;
+    float:right;
+    height: inherit;
+    margin-top:15px;
+}
+    header .nav li, header .nav li a {
+        display: inline-block;
+        text-decoration: none;
+        transition: 0.4s;
+        color: #0e2e49;
+        font-family: 'Gotham',Arial, sans-serif;
+        font-weight: 600;
+        font-size: 16px;
+        margin-right: 25px;
+        text-transform: uppercase;
+        height: 100%;
+    }
+.nav li a:hover {
+    background-color: #0e2e49;
+    height:35px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    padding:10px 10px 0 10px;
+    margin-top:0;
+}
+
 
 .form {
     text-align: center;
@@ -41,21 +71,22 @@
 
 .main{
     text-align: center;
+    color: white;
 }
 
 .info {
     text-align: center;
-    background-color: rgba(255,255,255,0.7);
+    background-color: rgba(255,255,255,0.9);
     width: 1200px;
     padding: 25px;
-    margin: 25px;
+    margin: 10px 25px 10px 25px;
     border-radius: 25px;
     display: inline-block;
 }
 
 .data {
     text-align: center;
-    background-color: rgba(255,255,255,0.7);
+    background-color: rgba(255,255,255,0.9);
     width: 90%;
     padding: 25px;
     margin: 25px;
@@ -82,11 +113,15 @@
 	background-color: rgba(255,255,255,0.7);
 }
 
-svg path {
+/*svg path {
     will-change: auto;
     stroke-width: 20px;
     stroke-miterlimit: round;
     transition: stroke-dashoffset 850ms ease-in-out;
+}*/
+
+.search {
+    color: white;
 }
 
 #searchbar{ 
@@ -109,3 +144,22 @@ svg path {
 
 
 #searchButton, #feedbackButton, #emailtodb, #loginButton {height: 30px; background-color: rgba(255,255,255,0.9);}
+
+.main .dashboard{
+    max-width: 100%;
+    max-height: 30%;
+}
+
+.main .dashboard{
+    padding-left: 10%;
+    margin-bottom: 3%;
+}
+
+.adminFunctions{
+    line-height: 20px;
+    color: white;
+}
+
+.adminFunctions input{
+    margin: 5px 20px 20px 0px;
+}

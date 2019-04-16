@@ -3,27 +3,36 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Login</title>
+    <title>Home</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" media="screen" href="../css/index.css">
     <script src="../js/account.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+    <link rel='shortcut icon' href='../img/favicon.ico' type='image/x-icon'>
 </head>
 <body id = "account">
-    <div id="header">
-        <a href="#" target="_self"><h1 style="font-family: Papyrus, cursive;">Operation Happiness</h1></a>
-    </div>
-    <div class="main">
-        <div class="info">
-            <h2>Welcome to your Employee Happiness Detection Software</h2>
-            <p>
-                This software allows for you to manage the overall health of your employees. You can see their overall sentiment score on a scale of 100.<br />
-                If the employee ever has their score drop more than 20 points within a day, they will be prompted to respond to a survey to see what affected their experience that day. <br /><br />
-                This allows for actionable management and feedback on the days that are especially difficult for your employees.
-            </p>
+    <header>
+        <div class="logo">
+            <a href="./account.html" target="_self"><img src="../img/usaa.png" alt="USAA" height="66" /></a>
         </div>
+        <ul class="nav">
+            <li><a href="./account.html">Dashboard</a></li>
+            <li><a href="./employees.html">Employee Feedback</a></li>
+        </ul>
+    </header>
+    <div class="main">
+        <!--Div that will hold the pie chart-->
+        <table class="dashboard">
+            <tr>
+                <td id="barchart_div"></td>
+                <td id="gauge_div"></td>
+                <td id="line_div"></td>
+            </tr>
+        </table>
+        <hr />
         <div class="search">
-            <h4>Search by User Email or Department</h4>
+            <h3>Employee Table</h3>
             <input type="text" id="searchbar" placeholder="Enter an email address or department">
             <label>Minimum Score: </label><input type="number" id="minScore" min="0" max="99" value="0">
             <label>Maximum Score: </label><input type="number" id="maxScore" min="1" max="100" value="100">
@@ -48,8 +57,22 @@
             <tbody id="tableBody"></tbody>
         </table>
         <div id="error"></div>
-        <input type="button" id="feedbackButton" value="Send Feedback Emails">
-        <input type="button" id="emailtodb" value="Save Emails in Database">
+        <hr />
+        <div class="adminFunctions">
+            <h3>Admin Functions</h3>
+            <input type="button" id="feedbackButton" value="Send Feedback Emails">
+            <input type="button" id="emailtodb" value="Save Emails in Database">
+            <label>Select Department: </label>
+            <select id="depSelect">
+                <option value="accounting">Accounting</option>
+                <option value="informationTech">Information Technology</option>
+                <option value="marketing">Marketing</option>
+                <option value="rAndD">Research and Development</option>
+                <option value="sales">Sales</option>
+                <option value="supplyChain">Supply Chain</option>
+            </select>
+            <input type="button" id="csvButton" value="CSV Export" />
+        </div>
     </div>
 </body>
 </html>
