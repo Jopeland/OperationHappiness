@@ -567,22 +567,23 @@ namespace happinessIndex.App_Start
                                 fixes = (string)reader["dFixes"];
                                 communication = (string)reader["hComms"];
                                 comments = (string)reader["comments"];
-                                date = (string)reader["mRecs"];
+                                DateTime dateTime = (DateTime)reader["date"];
+                                date = dateTime.ToString();
 
-                                char[] myChar = { ',','*' };
+                                string myChar = ",";
                                 if (approved.Contains(','))
-                                    approved = approved.Trim(myChar);
+                                    approved = approved.Replace(myChar, "");
                                 if (changes.Contains(','))
-                                    changes = changes.Trim(myChar);
+                                    changes = changes.Replace(myChar, "");
                                 if (fixes.Contains(','))
-                                    fixes = fixes.Trim(myChar);
+                                    fixes = fixes.Replace(myChar, "");
                                 if (communication.Contains(','))
-                                    communication = communication.Trim(myChar);
+                                    communication = communication.Replace(myChar, "");
                                 if (comments.Contains(','))
-                                    comments = comments.Trim(myChar);
+                                    comments = comments.Replace(myChar, "");
 
 
-                                csv += $"\n{UID},{department},{scoreChange},{approved},{changes},{fixes},{communication},{comments},{date}";
+                                csv += $"\n={UID},{department},{scoreChange},{approved},{changes},{fixes},{communication},{comments},{date}";
                             }
 
                             return csv;
