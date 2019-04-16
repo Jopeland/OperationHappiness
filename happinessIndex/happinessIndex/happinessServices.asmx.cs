@@ -244,6 +244,8 @@ namespace happinessIndex.App_Start
         [WebMethod]
         public string RetrieveEmails()
         {
+            string notice = "";
+
             // string variables declared to store parts of the message
             string sender;
             string date;
@@ -270,6 +272,8 @@ namespace happinessIndex.App_Start
                     emails.Add(mail);
                 }
 
+                notice += $"Email count: {emails.Count}. ";
+
                 for (int i = 0; i < emails.Count; i++)
                 {
                     emails[i].UnRead = false;
@@ -280,11 +284,17 @@ namespace happinessIndex.App_Start
                     subject = emails[i].Subject;
                     body = emails[i].Body;
 
+                    notice += $"Email collected: {sender}, {date}, {subject}, {body}. ";
+
                     // if the 4 strings are not empty, the email is added to the emails database(just for testing, this isnt the permanent solution for now)
                     if (sender != null && date != null && subject != null && body != null)
                     {
+
+                        notice += $"Email matches parameters. ";
                         // passing email body into sentiment analysis
                         int sentiment = SentimentAnalysis(body);
+
+                        notice += $"Sentmient Analysis run {sentiment}.  ";
 
                         if (sentiment >= 6)
                             sentiment = 2;
@@ -297,16 +307,20 @@ namespace happinessIndex.App_Start
                         else
                             sentiment = -1;
 
+                        notice += $"Sentiment level altered: {sentiment}. ";
+
                         // grabbing connection string from config file
                         string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
 
+                        string sqlSelect = $"SELECT * FROM employees where Email = '{sender}'";
+
                         // set up our connection object to be ready to use our connection string
                         MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
+                        MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
                         sqlConnection.Open();
+                        MySqlDataReader reader = sqlCommand.ExecuteReader();
 
-                        // getting current score and editing
-                        MySqlCommand getScore = new MySqlCommand($"SELECT * FROM employees where Email = {sender}", sqlConnection);
-                        MySqlDataReader reader = getScore.ExecuteReader();
+                        notice += $"Reader initiated. ";
 
 
                         int score = 0;
@@ -316,7 +330,9 @@ namespace happinessIndex.App_Start
                             {
                                 while (reader.Read())
                                 {
+                                    notice += $"Sentiment = {sentiment} and Current = {(int)reader["Happiness"]}. ";
                                     score = sentiment + (int)reader["Happiness"];
+                                    notice += $"Score analyzed = {score}. ";
                                 }
                             }
                             else
@@ -328,7 +344,8 @@ namespace happinessIndex.App_Start
                         {
                             reader.Close();
                         }
-                        
+
+
                         // instantiating new command
                         MySqlCommand addScore = new MySqlCommand("INSERT INTO Scores(UserEmail,Date,Score) VALUES(@sender,@date,@score)", sqlConnection);
 
@@ -340,15 +357,17 @@ namespace happinessIndex.App_Start
                         // running command
                         addScore.ExecuteNonQuery();
 
+                        notice += "Inserted into scores DB.";
+
                         sqlConnection.Close();
                     }
 
                 }
-                return "Sentiment Analyzed";
+                return notice;
             }
             catch
             {
-                return "Email Sentiment Analysis Failed";
+                return notice;
             }
         }
 
