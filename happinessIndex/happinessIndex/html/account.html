@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" media="screen" href="../css/index.css">
     <script src="../js/account.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
     <link rel='shortcut icon' href='../img/favicon.ico' type='image/x-icon'>
 </head>
@@ -16,20 +17,20 @@
             <a href="./account.html" target="_self"><img src="../img/usaa.png" alt="USAA" height="66" /></a>
         </div>
         <ul class="nav">
-            <li><a href="./account.html">Home</a></li>
-            <li><a href="./dashboard.html">Dashboard</a></li>
+            <li><a href="./account.html">Dashboard</a></li>
             <li><a href="./employees.html">Employee Feedback</a></li>
         </ul>
     </header>
     <div class="main">
-        <div class="info">
-            <h2>Welcome to your Employee Happiness Detection Software</h2>
-            <p>
-                This software allows for you to manage the overall health of your employees. You can see their overall sentiment score on a scale of 100.<br />
-                If the employee ever has their score drop more than 20 points within a day, they will be prompted to respond to a survey to see what affected their experience that day. <br /><br />
-                This allows for actionable management and feedback on the days that are especially difficult for your employees.
-            </p>
-        </div>
+        <!--Div that will hold the pie chart-->
+        <table class="dashboard">
+            <tr>
+                <td id="barchart_div"></td>
+                <td id="gauge_div"></td>
+                <td id="line_div"></td>
+            </tr>
+        </table>
+        <hr />
         <div class="search">
             <h4>Search by User Email or Department</h4>
             <input type="text" id="searchbar" placeholder="Enter an email address or department">
@@ -56,8 +57,10 @@
             <tbody id="tableBody"></tbody>
         </table>
         <div id="error"></div>
-        <input type="button" id="feedbackButton" value="Send Feedback Emails">
-        <input type="button" id="emailtodb" value="Save Emails in Database">
+        <div id="adminFunctions">
+            <input type="button" id="feedbackButton" value="Send Feedback Emails">
+            <input type="button" id="emailtodb" value="Save Emails in Database">
+        </div>
     </div>
 </body>
 </html>

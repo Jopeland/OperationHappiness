@@ -863,7 +863,7 @@ namespace happinessIndex.App_Start
             }
 
             // Next a list of the values for today are queried for and added to their own list which is added to values
-            string getToday = $"SELECT e.Department, ROUND(avg(s.Score)) AS avgscore FROM Employees e, Scores s Where e.Email = s.UserEmail AND DATE(s.Date) = CURRENT_DATE() GROUP BY e.Department Order BY e.Department";
+            string getToday = $"SELECT e.Department, ROUND(avg(s.Score)) AS avgscore FROM Employees e, Scores s Where e.Email = s.UserEmail AND DATE(s.Date) = CURRENT_DATE() GROUP BY e.Department Order BY e.Department DESC";
             MySqlCommand todayAverage = new MySqlCommand(getToday, sqlConnection);
             sqlConnection.Open();
             MySqlDataReader todayReader = todayAverage.ExecuteReader();

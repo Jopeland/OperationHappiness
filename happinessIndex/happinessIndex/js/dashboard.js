@@ -46,6 +46,7 @@ function avgByDept() {
             // The chart variable is returned for use in buildDashboard
             var chart = new google.visualization.ColumnChart(document.getElementById('barchart_div'));
             chart.draw(tableData, options);
+            console.log("succeeded on bar chart");
         },
         error: function (e) {
             alert("Error happens here");
@@ -81,6 +82,7 @@ function overallHappiness() {
 
             var gauge = new google.visualization.Gauge(document.getElementById('gauge_div'));
             gauge.draw(gaugeData, options);
+            console.log("succeeded on meter chart");
         },
         error: function (e) {
             alert("Error happens here");
@@ -117,6 +119,8 @@ function happinessOverTime() {
 
             var lineChart = new google.charts.Line(document.getElementById('line_div'));
             lineChart.draw(lineData, google.charts.Line.convertOptions(options));
+            console.log("succeeded on line chart");
+
         },
         error: function (e) {
             alert("Error happens here");
