@@ -471,11 +471,12 @@ namespace happinessIndex.App_Start
                             fixes = (string)reader["dFixes"];
                             communication = (string)reader["hComms"];
                             comments = (string)reader["comments"];
-                            date = (string)reader["mRecs"];
+                            DateTime dateTime = (DateTime)reader["date"];
+                            date = dateTime.ToString();
 
 
                             int num = 1;
-                            html += "<tr><td class='email'>" + email + "</td><td class='department'>" + department + "</td><td class='scoreChange'>" + scoreChange + "</td><td class='approved'>" + approved + "</td><td class='changes'>" + changes + "</td><td class='fixes'>" + fixes + "</td><td class='communication'>" + communication + "</td><td class='comments'>" + comments + "</td><td class='date'>" + date + "</td></tr>";
+                            html += "<tr><td class='email' style='word-wrap: break-word;'>" + email + "</td><td class='dept' style='word-wrap: break-word;'>" + department + "</td><td class='score' style='word-wrap: break-word;'>" + scoreChange + "</td><td class='approved' style='word-wrap:break-word;'>" + approved + "</td><td class='changes' style='word-wrap: break-word;'>" + changes + "</td><td class='fixes' style='word-wrap: break-word;'>" + fixes + "</td><td class='communication' style='word-wrap: break-word;'>" + communication + "</td><td class='comments' style='word-wrap: break-word;'>" + comments + "</td><td class='date' style='word-wrap: break-word;'>" + date + "</td></tr>";
                             num++;
                         }
 

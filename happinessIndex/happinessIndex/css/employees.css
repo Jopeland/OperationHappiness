@@ -94,15 +94,24 @@ header .nav {
     display: inline-block;
     overflow:hidden;
 }
+.approved, .changes, .fixes, .communication, .comments {
+    width: 250px!important;
+    background-color: rgba(255,255,255,0.7);
+    text-align:left;
+}
 
 .data thead tr th{
     border-bottom: 1px solid black;
     padding-bottom: 5px;
     color:black;
 }
+.email, .date {
+    width: 150px!important;
+    background-color: rgba(255,255,255,0.7);
+}
 
-.email, .score, .dept{
-    width: 300px;
+.score, .dept{
+    width: 100px!important;
 	background-color: rgba(255,255,255,0.7);
 }
 
