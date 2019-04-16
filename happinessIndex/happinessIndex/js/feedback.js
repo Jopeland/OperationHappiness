@@ -13,26 +13,31 @@ function SendFeedback() {
 
     if (email == "" || mRecs == "" || mChange == "" || dFixed == "" || hComms == "" || comments == "") {
         window.alert("Please fill out all fields");
-        break;
     }
     else {
-        var parameters = "{\"email\":\"" + encodeURI(email) + "\",\"mRecs\":\"" + encodeURI(mRecs) + "\",\"mChange\":\"" + encodeURI(mChange) + "\",\"dFixed\":\"" + encodeURI(dFixed) + "\",\"hComms\":\"" + encodeURI(hComms) + "\",\"comments\":\"" + encodeURI(comments) + "\"}";
-    }
+        var parameters = "{\"email\":\"" + encodeURI(email) + "\",\"mRecs\":\"" + mRecs + "\",\"mChange\":\"" + mChange + "\",\"dFixed\":\"" + dFixed + "\",\"hComms\":\"" + hComms + "\",\"comments\":\"" + comments + "\"}";
 
-    $.ajax({
-        type: "POST",
-        data: parameters,
-        url: "../happinessServices.asmx/CollectFeedback",
-        contentType: "application/json;charset=utf-8",
-        dataType: "json",
-        success: function (data) {
-            console.log(data.d)
-            $("textarea").prop("disabled", true);
-            $("button").prop("disabled", true);
-            $("#thankYou").show();
-        },
-        error: function (e) {
-            window.alert("Something went wrong");
-        }
-    })
+        $.ajax({
+            type: "POST",
+            data: parameters,
+            url: "../happinessServices.asmx/CollectFeedback",
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                console.log(data.d)
+                $("textarea").prop("disabled", true);
+                $("#submitFeedback").prop("disabled", true);
+                $("#thankYou").show();
+                window.alert("Thank you for submitting this form!");
+                closeWindow()
+            },
+            error: function (e) {
+                window.alert("Something went wrong");
+            }
+        })
+    }
+}
+
+function closeWindow() {
+    setTimeout(function () { window.close(); }, 5000);
 }
