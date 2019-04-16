@@ -426,6 +426,190 @@ namespace happinessIndex.App_Start
         }
 
         [WebMethod]
+        // [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public string ViewFeedback(string type, string choice = "")
+        {
+            // variable to store HTML string to be appended using JS
+            string html = "";
+            string csv = "User ID, Department, Score Change, Approved processes, Recommended Changes, Fixes Recommended, Communication, Additional Comments, Date";
+
+            string email = "";
+            string department = "";
+            int scoreChange = 0;
+            string approved = "";
+            string changes = "";
+            string fixes = "";
+            string communication = "";
+            string comments = "";
+            string date = "";
+
+            if (type == "load")
+            {
+                // mostly the same code as VerifyCredentials
+                string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
+
+                // instantiating query
+                string sqlSelect = $"Select * FROM responses";
+
+                MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
+                MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
+                sqlConnection.Open();
+
+                MySqlDataReader reader = sqlCommand.ExecuteReader();
+
+                try
+                {
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            email = (string)reader["userEmail"];
+                            department = (string)reader["Department"];
+                            scoreChange = (int)reader["scoreChange"];
+                            approved = (string)reader["mRecs"];
+                            changes = (string)reader["mChange"];
+                            fixes = (string)reader["dFixes"];
+                            communication = (string)reader["hComms"];
+                            comments = (string)reader["comments"];
+                            date = (string)reader["mRecs"];
+
+
+                            int num = 1;
+                            html += "<tr><td class='email'>" + email + "</td><td class='department'>" + department + "</td><td class='scoreChange'>" + scoreChange + "</td><td class='approved'>" + approved + "</td><td class='changes'>" + changes + "</td><td class='fixes'>" + fixes + "</td><td class='communication'>" + communication + "</td><td class='comments'>" + comments + "</td><td class='date'>" + date + "</td></tr>";
+                            num++;
+                        }
+
+                        return html;
+                    }
+
+                    else
+                    {
+                        html = null;
+                        return html;
+                    }
+                }
+
+                finally
+                {
+                    reader.Close();
+                    sqlConnection.Close();
+                }
+            }
+            else
+            {
+                List<string> UIDs = new List<string>();
+                List<string> emails = new List<string>();
+
+                // mostly the same code as VerifyCredentials
+                string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
+
+                // instantiating query
+                string sqlSelect = $"Select * FROM employees WHERE Department = '{choice}'";
+
+                MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
+                MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
+                sqlConnection.Open();
+
+                MySqlDataReader reader = sqlCommand.ExecuteReader();
+
+                try
+                {
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            string UID = (string)reader["UUID"];
+                            email = (string)reader["Email"];
+
+                            string tmpString = UID + "," + email;
+
+                            emails.Add(email);
+                            UIDs.Add(tmpString);
+                        }
+
+                        sqlConnection.Close();
+                        reader.Close();
+
+                        sqlSelect = $"Select * FROM responses WHERE ";
+                        for (int i = 0; i<emails.Count; i++)
+                        {
+                            if (i == 0)
+                                sqlSelect += $"userEmail = '{emails[i]}' ";
+                            else
+                                sqlSelect += $"OR userEmail = '{emails[i]}' ";
+                        }
+
+                        sqlConnection = new MySqlConnection(sqlConnectString);
+                        sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
+                        sqlConnection.Open();
+
+                        reader = sqlCommand.ExecuteReader();
+
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                string UID = "";
+                                email = (string)reader["userEmail"];
+
+                                for (int i = 0; i < UIDs.Count; i++)
+                                {
+                                    if (UIDs[i].Contains(email))
+                                    {
+                                        List<string> tmpList = UIDs[i].Split(',').ToList<string>();
+                                        UID = tmpList[0];
+                                    }
+                                }
+                                department = (string)reader["Department"];
+                                scoreChange = (int)reader["scoreChange"];
+                                approved = (string)reader["mRecs"];
+                                changes = (string)reader["mChange"];
+                                fixes = (string)reader["dFixes"];
+                                communication = (string)reader["hComms"];
+                                comments = (string)reader["comments"];
+                                date = (string)reader["mRecs"];
+
+                                char[] myChar = { ',','*' };
+                                if (approved.Contains(','))
+                                    approved = approved.Trim(myChar);
+                                if (changes.Contains(','))
+                                    changes = changes.Trim(myChar);
+                                if (fixes.Contains(','))
+                                    fixes = fixes.Trim(myChar);
+                                if (communication.Contains(','))
+                                    communication = communication.Trim(myChar);
+                                if (comments.Contains(','))
+                                    comments = comments.Trim(myChar);
+
+
+                                csv += $"\n{UID},{department},{scoreChange},{approved},{changes},{fixes},{communication},{comments},{date}";
+                            }
+
+                            return csv;
+                        }
+
+                        else
+                        {
+                            return csv;
+                        }
+                    }
+
+                    else
+                    {
+                        return csv;
+                    }
+                }
+
+                finally
+                {
+                    reader.Close();
+                    sqlConnection.Close();
+                }
+            }
+            
+        }
+
+        [WebMethod]
         public void SendFeedbackEmail()
         {
             // Establish Outlook connection
