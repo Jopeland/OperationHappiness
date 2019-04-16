@@ -9,6 +9,10 @@
     <script src="../js/index.js"></script>
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
     <link rel='shortcut icon' href='../img/favicon.ico' type='image/x-icon'>
+    <meta charset="utf-8" />
+    <title>Submit Your Feedback!</title>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="../js/feedback.js"></script>
 </head>
 <body id="feedbackPrompt">
     <header>
@@ -22,25 +26,27 @@
         <h2>Employee Feedback Form</h2>
         <p>We are sending you this email because we are interested in how your day went. All of these answers are confidential. Please answer to the best of your ability.</p>
         <br />
-        <form id="feedbackForm">
-            <p>What would you recommend your manager keep doing?</p>
-            <input type="text" id="open1" />
-            <br />
-            <p>What would you have your manager change?</p>
-            <input type="text" id="open2" />
-            <br />
-            <p>What processes in your department should be fixed or improved?</p>
-            <input type="text" id="open3" />
-            <br />
-            <p>Is there healthy communication between you and your manager(s)? How can communication between leadership and staff be improved?</p>
-            <input type="text" id="open4" />
-            <br />
-            <p>Do you have any other comments that you'd like to make?</p>
-            <input type="text" id="open5" />
-            <br />
-            <input type="submit" />
-            <br />
-        </form>
+        <input type="text" placeholder="Enter your Email" id="email">
+        <p>What would you recommend your manager keep doing?</p>
+        <textarea maxlength="5000" id="open1"></textarea>
+        <br />
+        <p>What would you have your manager change?</p>
+        <textarea maxlength="5000" id="open2"></textarea>
+        <br />
+        <p>What processes in your department should be fixed or improved?</p>
+        <textarea maxlength="5000" id="open3"></textarea>
+        <br />
+        <p>Is there healthy communication between you and your manager(s)? How can communication between leadership and staff be improved?</p>
+        <textarea maxlength="5000" id="open4"></textarea>
+        <br />
+        <p>Do you have any other comments that you'd like to make?</p>
+        <textarea maxlength="5000" id="open5"></textarea>
+        <br />
+        <input type="button" value="Submit" id="submitFeedback">
+        <br />
+    </div>
+    <div class="footer">
+        <h1 id="thankYou">Thank you for your response!</h1>
     </div>
 </body>
 </html>

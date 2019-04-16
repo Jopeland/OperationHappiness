@@ -231,6 +231,7 @@
     <Content Include="index.html" />
     <Content Include="js\account.js" />
     <Content Include="js\dashboard.js" />
+    <Content Include="js\feedback.js" />
     <Content Include="js\index.js" />
     <Content Include="Web.config" />
   </ItemGroup>
