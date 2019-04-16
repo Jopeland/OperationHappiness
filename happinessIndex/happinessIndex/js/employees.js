@@ -35,7 +35,7 @@
 
 function saveCSV() {
     var department = $('#depSelect').val();
-    var parameters = "{\"type\":\"\",\"choice\":\"" + encodeURI(department) + "\"}";
+    var parameters = "{\"type\":\"\",\"choice\":\"" + department + "\"}";
 
     $.ajax({
         type: "POST",
@@ -49,7 +49,7 @@ function saveCSV() {
             var hiddenElement = document.createElement('a');
             hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(data.d);
             hiddenElement.target = '_blank';
-            hiddenElement.download = department + 'Feedback.csv';
+            hiddenElement.download = department + ' Feedback.csv';
             hiddenElement.click();
         },
         error: function (e) {
