@@ -1097,16 +1097,39 @@ namespace happinessIndex.App_Start
         [WebMethod]
         public bool CollectFeedback(string email, string mRecs, string mChange, string dFixed, string hComms, string comments)
         {
+            string department = "";
+
             try
             {
                 string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
                 MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
                 sqlConnection.Open();
+
+                // select statement to get department
+                MySqlCommand getDepartment = new MySqlCommand($"Select Department FROM employees WHERE email = '{email}'", sqlConnection);
+                MySqlDataReader reader = getDepartment.ExecuteReader();
+
+                try
+                {
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            department = (string)reader["Department"];
+                        }
+                    }
+                }
+                finally
+                {
+                    reader.Close();
+                }
+
                 // insert statement
-                MySqlCommand insertFeedback = new MySqlCommand("INSERT INTO `responses`(`userEmail`, `mRecs`, `mChange`, `dFixes`, `hComms`, `comments`) VALUES (@email,@mRecs,@mChange,@dFixed,@hComms,@comments)", sqlConnection);
+                MySqlCommand insertFeedback = new MySqlCommand("INSERT INTO responses(userEmail, department, mRecs, mChange, dFixes, hComms, comments) VALUES (@userEmail,@department,@mRecs,@mChange,@dFixed,@hComms,@comments)", sqlConnection);
 
                 // parameters added
-                insertFeedback.Parameters.AddWithValue("@email", email);
+                insertFeedback.Parameters.AddWithValue("@userEmail", email);
+                insertFeedback.Parameters.AddWithValue("@department", department);
                 insertFeedback.Parameters.AddWithValue("@mRecs", mRecs);
                 insertFeedback.Parameters.AddWithValue("@mChange", mChange);
                 insertFeedback.Parameters.AddWithValue("@dFixed", dFixed);
