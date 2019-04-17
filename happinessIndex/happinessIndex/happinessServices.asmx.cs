@@ -1124,12 +1124,38 @@ namespace happinessIndex.App_Start
                     reader.Close();
                 }
 
+                // query for scorechange
+                int scoreChange = 0;
+
+                // SQL command takes only the top 2 results that the database contains
+                MySqlCommand feedbackUsers = new MySqlCommand($"Select ScoreID, Score FROM scores WHERE UserEmail = '{email}' ORDER BY ScoreID DESC LIMIT 2", sqlConnection);
+                reader = feedbackUsers.ExecuteReader();
+
+                if (reader.HasRows)
+                {
+                    while (reader.Read())
+                    {
+                        // if the change variable is 0, change is set equal to score
+                        if (scoreChange == 0)
+                        {
+                            scoreChange = Convert.ToInt32(reader["Score"]);
+                        }
+                        else // else it finds the difference between the first score and the second
+                        {
+                            scoreChange = scoreChange - Convert.ToInt32(reader["Score"]);
+                        }
+                    }
+                }
+
+                reader.Close();
+
                 // insert statement
-                MySqlCommand insertFeedback = new MySqlCommand("INSERT INTO responses(userEmail, department, mRecs, mChange, dFixes, hComms, comments) VALUES (@userEmail,@department,@mRecs,@mChange,@dFixed,@hComms,@comments)", sqlConnection);
+                MySqlCommand insertFeedback = new MySqlCommand("INSERT INTO responses(userEmail, department, scoreChange, mRecs, mChange, dFixes, hComms, comments) VALUES (@userEmail,@department,@scoreChange,@mRecs,@mChange,@dFixed,@hComms,@comments)", sqlConnection);
 
                 // parameters added
                 insertFeedback.Parameters.AddWithValue("@userEmail", email);
                 insertFeedback.Parameters.AddWithValue("@department", department);
+                insertFeedback.Parameters.AddWithValue("@scoreChange", scoreChange);
                 insertFeedback.Parameters.AddWithValue("@mRecs", mRecs);
                 insertFeedback.Parameters.AddWithValue("@mChange", mChange);
                 insertFeedback.Parameters.AddWithValue("@dFixed", dFixed);
